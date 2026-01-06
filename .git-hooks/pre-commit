@@ -1,0 +1,33 @@
+#!/bin/bash
+# Pre-commit hook to run linters and formatters
+
+echo "🔍 Running pre-commit checks..."
+
+# Frontend checks
+if [ -d "college_event_management/frontend" ]; then
+    echo "📝 Frontend: Checking ESLint..."
+    cd college_event_management/frontend
+    npm run lint:fix
+    if [ $? -ne 0 ]; then
+        echo "❌ ESLint failed"
+        exit 1
+    fi
+    
+    echo "✨ Frontend: Formatting with Prettier..."
+    npm run format
+    cd ../..
+fi
+
+# Backend checks
+if [ -d "college_event_management/backend" ]; then
+    echo "🐍 Backend: Running Black..."
+    cd college_event_management/backend
+    black . 2>/dev/null
+    
+    echo "🐍 Backend: Checking with Ruff..."
+    ruff check . --fix 2>/dev/null
+    cd ../..
+fi
+
+echo "✅ Pre-commit checks passed!"
+exit 0

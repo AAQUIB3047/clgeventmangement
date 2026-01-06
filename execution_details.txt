@@ -1,0 +1,70 @@
+College Event Management System - Execution Details
+
+Project Overview:
+This is a full-stack college event management system with:
+- Django backend (REST API for user management, events, registrations, attendance)
+- Spring Boot microservice (for admin operations, dashboard data)
+- React frontend (user interface)
+- MongoDB database (via djongo for Django, native for Spring Boot)
+
+Prerequisites:
+1. Install MongoDB Community Edition
+   - Download from https://www.mongodb.com/try/download/community
+   - Follow installation instructions for your OS
+   - Start MongoDB service
+
+2. Install Java 17 or higher
+   - Download from https://adoptium.net/
+
+3. Install Node.js 16 or higher
+   - Download from https://nodejs.org/
+
+4. Install Python 3.8 or higher
+   - Download from https://python.org/
+
+Execution Commands:
+
+1. Start MongoDB:
+   mongod
+
+2. Setup Django Backend:
+   cd college_event_management/backend
+   python -m venv venv
+   venv\Scripts\activate  (Windows) or source venv/bin/activate (Linux/Mac)
+   pip install -r requirements.txt
+   python manage.py makemigrations
+   python manage.py migrate
+   python manage.py runserver 8000
+
+3. Setup Spring Boot Backend:
+   cd college_event_management/spring_backend
+   mvn clean install
+   mvn spring-boot:run
+
+4. Setup React Frontend:
+   cd college_event_management/frontend
+   npm install
+   npm start
+
+Services will run on:
+- Django API: http://localhost:8000
+- Spring Boot Admin Service: http://localhost:8080
+- React Frontend: http://localhost:3000
+
+Important Notes:
+- Ensure MongoDB is running before starting the backends
+- The system uses JWT authentication
+- Admin panel operations are handled by Spring Boot microservice
+- CORS is configured for frontend-backend communication
+- Database: college_event_management (MongoDB)
+
+Testing:
+- Create admin user: python add_user.py (in backend directory)
+- Access admin panel at http://localhost:3000/admin
+- Test login and event management features
+
+Deployment:
+- For production, update settings.py with production database URL
+- Configure environment variables for secrets
+- Use reverse proxy (nginx) for serving static files
+- Containerize with Docker for easy deployment
