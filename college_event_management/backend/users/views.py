@@ -1,4 +1,3 @@
-import json
 import os
 
 from google.auth.transport import requests

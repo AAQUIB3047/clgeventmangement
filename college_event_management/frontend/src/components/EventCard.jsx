@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import '../styles/eventcard.css';
 
@@ -68,6 +69,20 @@ const EventCard = ({ event }) => {
       </div>
     </div>
   );
+};
+
+EventCard.propTypes = {
+  event: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    date: PropTypes.string.isRequired,
+    location: PropTypes.string.isRequired,
+    capacity: PropTypes.number.isRequired,
+    registered: PropTypes.number.isRequired,
+    image: PropTypes.string,
+    status: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 export default EventCard;
