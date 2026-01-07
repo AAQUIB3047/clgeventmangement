@@ -31,7 +31,7 @@ const Login = ({ setAuth, setUser }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/login/', {
+      const response = await axios.post('http://localhost:8000/api/users/login/', {
         email,
         password,
       });

@@ -20,6 +20,126 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    def register(self, request):
+        """
+        Register a new student user.
+        
+        Expected payload:
+        {
+            "email": "student@example.com",
+            "password": "securepassword123",
+            "first_name": "John",
+            "last_name": "Doe"
+        }
+        """
+        try:
+            email = request.data.get('email')
+            password = request.data.get('password')
+            first_name = request.data.get('first_name', '')
+            last_name = request.data.get('last_name', '')
+
+            # Validation
+            if not email or not password:
+                return Response(
+                    {"error": "Email and password are required"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            if len(password) < 6:
+                return Response(
+                    {"error": "Password must be at least 6 characters long"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Check if user already exists
+            if User.objects.filter(email=email).exists():
+                return Response(
+                    {"error": "Email already registered"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Create new user
+            user = User.objects.create_user(
+                email=email,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                role='student'
+            )
+
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+
+            user_data = UserSerializer(user).data
+
+            return Response({
+                'access': str(refresh.access_token),
+                'refresh': str(refresh),
+                'user': user_data,
+                'message': 'Registration successful! You are now logged in.'
+            }, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response(
+                {"error": f"Registration failed: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    def login(self, request):
+        """
+        Login with email and password.
+        
+        Expected payload:
+        {
+            "email": "student@example.com",
+            "password": "securepassword123"
+        }
+        """
+        try:
+            email = request.data.get('email')
+            password = request.data.get('password')
+
+            if not email or not password:
+                return Response(
+                    {"error": "Email and password are required"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Get user
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                return Response(
+                    {"error": "Invalid email or password"},
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+
+            # Check password
+            if not user.check_password(password):
+                return Response(
+                    {"error": "Invalid email or password"},
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+            user_data = UserSerializer(user).data
+
+            return Response({
+                'access': str(refresh.access_token),
+                'refresh': str(refresh),
+                'user': user_data,
+                'message': 'Login successful'
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response(
+                {"error": f"Login failed: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def profile(self, request):
         user = request.user

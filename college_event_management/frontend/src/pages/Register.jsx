@@ -17,7 +17,7 @@ const Register = ({ setAuth, setUser }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -40,7 +40,7 @@ const Register = ({ setAuth, setUser }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/register/', {
+      const response = await axios.post('http://localhost:8000/api/users/register/', {
         email: formData.email,
         password: formData.password,
         first_name: formData.first_name,
@@ -57,7 +57,11 @@ const Register = ({ setAuth, setUser }) => {
       setUser(user);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.detail || err.response?.data?.email?.[0] || 'Registration failed. Please try again.');
+      setError(
+        err.response?.data?.detail ||
+          err.response?.data?.email?.[0] ||
+          'Registration failed. Please try again.'
+      );
     } finally {
       setLoading(false);
     }
@@ -139,11 +143,7 @@ const Register = ({ setAuth, setUser }) => {
             />
           </div>
 
-          <button
-            type="submit"
-            className="btn btn-primary btn-lg"
-            disabled={loading}
-          >
+          <button type="submit" className="btn btn-primary btn-lg" disabled={loading}>
             {loading ? 'Creating Account...' : 'Create Account'}
           </button>
         </form>
