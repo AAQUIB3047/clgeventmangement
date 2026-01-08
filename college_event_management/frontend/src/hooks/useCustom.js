@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 /**
  * useApi Hook - Example
@@ -35,7 +35,6 @@ export const useApi = (url, options = {}) => {
       setData(result);
     } catch (err) {
       setError(err.message);
-      console.error('API Error:', err);
     } finally {
       setLoading(false);
     }
@@ -120,10 +119,9 @@ export const useForm = (initialValues, onSubmit) => {
 export const useLocalStorage = (key, initialValue) => {
   const [storedValue, setStoredValue] = useState(() => {
     try {
-      const item = window.localStorage.getItem(key);
+      const item = typeof window !== 'undefined' ? window.localStorage.getItem(key) : null;
       return item ? JSON.parse(item) : initialValue;
-    } catch (error) {
-      console.error('Error reading from localStorage:', error);
+    } catch {
       return initialValue;
     }
   });
@@ -133,9 +131,11 @@ export const useLocalStorage = (key, initialValue) => {
       try {
         const valueToStore = value instanceof Function ? value(storedValue) : value;
         setStoredValue(valueToStore);
-        window.localStorage.setItem(key, JSON.stringify(valueToStore));
-      } catch (error) {
-        console.error('Error writing to localStorage:', error);
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(key, JSON.stringify(valueToStore));
+        }
+      } catch {
+        // Handle error silently
       }
     },
     [key, storedValue]
@@ -195,12 +195,12 @@ export const usePagination = (items, itemsPerPage = 10) => {
 export const useDebounce = (value, delay = 500) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
-  React.useEffect(() => {
-    const handler = setTimeout(() => {
+  useEffect(() => {
+    const handler = window.setTimeout(() => {
       setDebouncedValue(value);
     }, delay);
 
-    return () => clearTimeout(handler);
+    return () => window.clearTimeout(handler);
   }, [value, delay]);
 
   return debouncedValue;

@@ -22,27 +22,22 @@ export const api = {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    try {
-      const response = await fetch(url, {
-        ...options,
-        headers,
-      });
+    const response = await fetch(url, {
+      ...options,
+      headers,
+    });
 
-      if (response.status === 401) {
-        // Token expired, redirect to login
-        localStorage.removeItem('access_token');
-        window.location.href = '/login';
-      }
-
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('API Request Error:', error);
-      throw error;
+    if (response.status === 401) {
+      // Token expired, redirect to login
+      localStorage.removeItem('access_token');
+      window.location.href = '/login';
     }
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status}`);
+    }
+
+    return await response.json();
   },
 
   get(endpoint, options) {
@@ -186,36 +181,32 @@ export const formatters = {
  */
 export const storage = {
   set(key, value) {
-    try {
+    if (typeof localStorage !== 'undefined') {
       localStorage.setItem(key, JSON.stringify(value));
-    } catch (error) {
-      console.error('Storage Error:', error);
     }
   },
 
   get(key) {
-    try {
-      const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : null;
-    } catch (error) {
-      console.error('Storage Error:', error);
-      return null;
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : null;
+      } catch {
+        return null;
+      }
     }
+    return null;
   },
 
   remove(key) {
-    try {
+    if (typeof localStorage !== 'undefined') {
       localStorage.removeItem(key);
-    } catch (error) {
-      console.error('Storage Error:', error);
     }
   },
 
   clear() {
-    try {
+    if (typeof localStorage !== 'undefined') {
       localStorage.clear();
-    } catch (error) {
-      console.error('Storage Error:', error);
     }
   },
 };
@@ -224,30 +215,27 @@ export const storage = {
  * Notification Utilities
  */
 export const notify = {
-  success(message) {
-    console.log('✅ Success:', message);
-    // Can be integrated with toast notification library
+  success() {
+    // Success notification - can be integrated with toast notification library
   },
 
-  error(message) {
-    console.error('❌ Error:', message);
+  error() {
+    // Error notification
   },
 
-  warning(message) {
-    console.warn('⚠️ Warning:', message);
+  warning() {
+    // Warning notification
   },
 
-  info(message) {
-    console.info('ℹ️ Info:', message);
+  info() {
+    // Info notification
   },
 };
 
 /**
  * Common Error Handler
  */
-export const handleError = (error, context = '') => {
-  console.error(`Error in ${context}:`, error);
-
+export const handleError = (error) => {
   let message = 'An error occurred';
 
   if (error instanceof Error) {

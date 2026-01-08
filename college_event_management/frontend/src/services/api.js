@@ -3,6 +3,8 @@
  * API service functions organized by feature
  */
 
+/* global URLSearchParams */
+
 import { api } from '../utils/helpers';
 
 /**

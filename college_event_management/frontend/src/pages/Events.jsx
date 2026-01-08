@@ -30,9 +30,8 @@ const Events = () => {
           const data = await response.json();
           setEvents(data);
         }
-      } catch (error) {
-        console.error('Failed to fetch events:', error);
-        // Sample data for demo
+      } catch {
+        // Failed to fetch events, use sample data
         setEvents(SAMPLE_EVENTS);
       } finally {
         setLoading(false);

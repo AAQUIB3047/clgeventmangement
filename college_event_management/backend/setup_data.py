@@ -2,12 +2,11 @@ import os
 from datetime import datetime, timedelta
 
 import django
+from django.contrib.auth.models import User
+from events.models import Event
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'event_management.settings')
 django.setup()
-
-from django.contrib.auth.models import User
-from events.models import Event
 
 # Create admin user if not exists
 admin, created = User.objects.get_or_create(username='admin')
