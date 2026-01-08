@@ -1,24 +1,49 @@
 from rest_framework import serializers
 
-from .models import StudentEnrollment, User
+from .models import Department, Faculty, Student, User
 
 
-class StudentEnrollmentSerializer(serializers.ModelSerializer):
+class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = StudentEnrollment
-        fields = ['id', 'email', 'full_name', 'branch', 'roll_number', 'created_at']
-        read_only_fields = ['created_at']
+        model = Department
+        fields = ['id', 'department_name', 'department_code', 'head_of_department']
+        read_only_fields = ['id']
+
+
+class StudentSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Student
+        fields = ['id', 'user', 'roll_number', 'year', 'department', 'created_at']
+        read_only_fields = ['id', 'created_at']
+    
+    def get_user(self, obj):
+        return UserSerializer(obj.user).data
+
+
+class FacultySerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Faculty
+        fields = ['id', 'user', 'employee_id', 'designation', 'department', 'created_at']
+        read_only_fields = ['id', 'created_at']
+    
+    def get_user(self, obj):
+        return UserSerializer(obj.user).data
 
 
 class UserSerializer(serializers.ModelSerializer):
-    enrollment = StudentEnrollmentSerializer(read_only=True)
+    department = DepartmentSerializer(read_only=True)
+    department_id = serializers.IntegerField(write_only=True, required=False)
     
     class Meta:
         model = User
         fields = ['id', 'email', 'first_name', 'last_name', 'username', 'role', 
-                  'phone_number', 'branch', 'department', 'is_google_user', 
-                  'profile_picture', 'enrollment']
-        read_only_fields = ['id', 'is_google_user', 'profile_picture']
+                  'phone_number', 'branch', 'department', 'department_id', 'is_google_user', 
+                  'profile_picture', 'is_active', 'created_at']
+        read_only_fields = ['id', 'is_google_user', 'profile_picture', 'created_at']
 
 
 class GoogleAuthSerializer(serializers.Serializer):
@@ -50,16 +75,6 @@ class GoogleAuthSerializer(serializers.Serializer):
                 'username': email.split('@')[0],
                 'is_google_user': True,
                 'profile_picture': data.get('picture', ''),
-                'branch': data.get('branch', 'other'),
-            }
-        )
-        
-        # Create or update StudentEnrollment
-        StudentEnrollment.objects.update_or_create(
-            user=user,
-            defaults={
-                'email': email,
-                'full_name': data['name'],
                 'branch': data.get('branch', 'other'),
             }
         )

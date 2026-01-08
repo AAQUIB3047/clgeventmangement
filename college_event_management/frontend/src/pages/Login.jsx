@@ -206,7 +206,8 @@ const Login = ({ setAuth, setUser }) => {
           </button>
         </form>
 
-        <div className="divider">
+        {/* Google login disabled - configure OAuth client ID in .env to enable */}
+        {/* <div className="divider">
           <span>or</span>
         </div>
 
@@ -219,7 +220,7 @@ const Login = ({ setAuth, setUser }) => {
             width="100%"
             text="signin_with"
           />
-        </div>
+        </div> */}
 
         <div className="auth-footer">
           <p>

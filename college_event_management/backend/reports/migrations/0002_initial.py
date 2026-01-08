@@ -10,35 +10,36 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("registrations", "0001_initial"),
+        ("reports", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="registration",
+            model_name="eventfeedback",
             name="student",
             field=models.ForeignKey(
                 limit_choices_to={"role": "student"},
                 on_delete=django.db.models.deletion.CASCADE,
-                related_name="event_registrations",
+                related_name="event_feedback",
                 to=settings.AUTH_USER_MODEL,
             ),
         ),
         migrations.AddIndex(
-            model_name="registration",
+            model_name="eventfeedback",
             index=models.Index(
-                fields=["event", "status"], name="registratio_event_i_246b4a_idx"
+                fields=["event", "rating"], name="reports_eve_event_i_6bcdc5_idx"
             ),
         ),
         migrations.AddIndex(
-            model_name="registration",
+            model_name="eventfeedback",
             index=models.Index(
-                fields=["student", "status"], name="registratio_student_244817_idx"
+                fields=["student", "submitted_at"],
+                name="reports_eve_student_e1c7df_idx",
             ),
         ),
         migrations.AlterUniqueTogether(
-            name="registration",
+            name="eventfeedback",
             unique_together={("event", "student")},
         ),
     ]
