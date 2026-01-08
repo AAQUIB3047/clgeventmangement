@@ -58,7 +58,8 @@ const Register = ({ setAuth, setUser }) => {
       navigate('/');
     } catch (err) {
       setError(
-        err.response?.data?.detail ||
+        err.response?.data?.error ||
+          err.response?.data?.detail ||
           err.response?.data?.email?.[0] ||
           'Registration failed. Please try again.'
       );

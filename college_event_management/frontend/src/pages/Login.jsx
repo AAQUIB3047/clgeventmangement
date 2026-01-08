@@ -46,7 +46,9 @@ const Login = ({ setAuth, setUser }) => {
       setUser(user);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Login failed. Please try again.');
+      setError(
+        err.response?.data?.error || err.response?.data?.detail || 'Login failed. Please try again.'
+      );
     } finally {
       setLoading(false);
     }
