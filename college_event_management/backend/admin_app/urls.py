@@ -1,10 +1,12 @@
-from django.urls import path
-from .views import AdminDashboardView, ManageUsersView, ManageEventsView
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
+
+from .views import AdminDashboardView, EventManagementViewSet
+
+router = DefaultRouter()
+router.register(r'events', EventManagementViewSet, basename='event-management')
 
 urlpatterns = [
     path('dashboard/', AdminDashboardView.as_view(), name='admin-dashboard'),
-    path('users/', ManageUsersView.as_view(), name='manage-users'),
-    path('users/<int:pk>/', ManageUsersView.as_view(), name='manage-user-detail'),
-    path('events/', ManageEventsView.as_view(), name='manage-events'),
-    path('events/<int:pk>/', ManageEventsView.as_view(), name='manage-event-detail'),
+    path('', include(router.urls)),
 ]

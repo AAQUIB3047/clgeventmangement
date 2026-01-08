@@ -1,8 +1,59 @@
 from rest_framework import serializers
-from .models import Event
+
+from .models import Category, Event, EventCoordinator, EventResource, Venue
+
+
+class VenueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Venue
+        fields = ['id', 'venue_name', 'location', 'capacity', 'facilities', 'has_projector', 'has_sound_system', 'availability_status']
+        read_only_fields = ['id']
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'category_name', 'description', 'icon']
+        read_only_fields = ['id']
+
+
+class EventCoordinatorSerializer(serializers.ModelSerializer):
+    faculty_name = serializers.CharField(source='faculty.get_full_name', read_only=True)
+    
+    class Meta:
+        model = EventCoordinator
+        fields = ['id', 'event', 'faculty', 'faculty_name', 'role', 'assigned_date']
+        read_only_fields = ['id', 'assigned_date']
+
+
+class EventResourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventResource
+        fields = ['id', 'event', 'resource_type', 'resource_name', 'quantity', 'status', 'cost']
+        read_only_fields = ['id']
+
 
 class EventSerializer(serializers.ModelSerializer):
+    venue_details = VenueSerializer(source='venue', read_only=True)
+    category_details = CategorySerializer(source='category', read_only=True)
+    created_by_name = serializers.CharField(source='created_by.get_full_name', read_only=True)
+    department_name = serializers.CharField(source='department.department_name', read_only=True)
+    registration_count = serializers.SerializerMethodField()
+    coordinators = EventCoordinatorSerializer(many=True, read_only=True, source='coordinators')
+    resources = EventResourceSerializer(many=True, read_only=True, source='resources')
+    
     class Meta:
         model = Event
-        fields = '__all__'
-        read_only_fields = ('created_at', 'updated_at')
+        fields = [
+            'id', 'title', 'description', 'event_date', 'start_time', 'end_time',
+            'venue', 'venue_details', 'category', 'category_details', 'department',
+            'department_name', 'max_capacity', 'current_registrations', 'registration_count',
+            'event_type', 'status', 'registration_fee', 'registration_deadline',
+            'poster_image', 'created_by', 'created_by_name', 'created_at', 'updated_at',
+            'coordinators', 'resources'
+        ]
+        read_only_fields = ('created_at', 'updated_at', 'created_by', 'registration_count')
+    
+    def get_registration_count(self, obj):
+        """Get count of confirmed registrations"""
+        return obj.registrations.filter(status='confirmed').count()
