@@ -1,23 +1,18 @@
-from datetime import timedelta
-
 from attendance.models import Attendance
 from django.core.mail import send_mail
-from django.db.models import Count, Q
-from django.template.loader import render_to_string
+from django.db.models import Count
 from django.utils import timezone
-from events.models import Category, Event, EventCoordinator, EventResource, Venue
+from events.models import Event
 from events.serializers import EventSerializer
 from registrations.models import Registration
 from registrations.serializers import RegistrationSerializer
-from reports.models import EventFeedback
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from users.models import AuditLog, Department, Faculty, Student, User
-from users.serializers import UserSerializer
+from users.models import AuditLog, Department, User
 
 
 class IsAdmin(IsAuthenticated):
@@ -175,7 +170,7 @@ class EventManagementViewSet(ModelViewSet):
         
         instance.delete()
         return Response(
-            {'message': f'Event deleted successfully', 'registrations_affected': registration_count},
+            {'message': 'Event deleted successfully', 'registrations_affected': registration_count},
             status=status.HTTP_204_NO_CONTENT
         )
 
