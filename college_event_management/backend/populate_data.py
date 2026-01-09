@@ -5,16 +5,15 @@ Run with: python manage.py shell < populate_data.py
 """
 
 import os
-from datetime import timedelta
+from datetime import time, timedelta
 
 import django
 from django.utils import timezone
+from events.models import Category, Event, Venue
+from users.models import Department, Faculty, Student, User
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'event_management.settings')
 django.setup()
-
-from events.models import Category, Event, Venue
-from users.models import Department, Faculty, Student, User
 
 print("=" * 60)
 print("SETTING UP SAMPLE DATA FOR COLLEGE EVENT MANAGEMENT")
@@ -218,7 +217,6 @@ if admin_user:
         },
     ]
 
-    from datetime import datetime, time
     for event_info in event_data:
         event_date = timezone.now().date() + timedelta(days=event_info['date_offset'])
         start_time = time(event_info['start_hour'], 0)
