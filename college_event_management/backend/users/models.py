@@ -118,3 +118,43 @@ class AuditLog(models.Model):
 
     def __str__(self):
         return f"{self.admin} - {self.action_type} on {self.entity_type} ({self.entity_id})"
+
+
+class GoogleAuth(models.Model):
+    """Google OAuth authentication model for storing Google auth credentials"""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='google_auth')
+    google_id = models.CharField(max_length=255, unique=True)
+    access_token = models.TextField()
+    refresh_token = models.TextField(blank=True, null=True)
+    token_expiry = models.DateTimeField(null=True, blank=True)
+    id_token = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Google Auth'
+        verbose_name_plural = 'Google Auths'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Google Auth for {self.user.email}"
+
+
+class Session(models.Model):
+    """Session model for tracking user sessions"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sessions')
+    session_token = models.CharField(max_length=500, unique=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = 'Session'
+        verbose_name_plural = 'Sessions'
+        ordering = ['-created_at']
+        indexes = [models.Index(fields=['session_token']), models.Index(fields=['user', 'is_active'])]
+
+    def __str__(self):
+        return f"Session for {self.user.email} ({self.session_token[:20]}...)"

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Department, Faculty, Student, User
+from .models import Department, Faculty, GoogleAuth, Session, Student, User
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
@@ -80,3 +80,21 @@ class GoogleAuthSerializer(serializers.Serializer):
         )
         
         return user, created
+
+
+class GoogleAuthModelSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    
+    class Meta:
+        model = GoogleAuth
+        fields = ['id', 'user', 'google_id', 'token_expiry', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'access_token', 'refresh_token', 'id_token']
+
+
+class SessionSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    
+    class Meta:
+        model = Session
+        fields = ['id', 'user', 'session_token', 'ip_address', 'user_agent', 'created_at', 'expires_at', 'is_active']
+        read_only_fields = ['id', 'session_token', 'created_at']

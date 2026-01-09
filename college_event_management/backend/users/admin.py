@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import AuditLog, Department, Faculty, Student, User
+from .models import AuditLog, Department, Faculty, GoogleAuth, Session, Student, User
 
 
 @admin.register(Department)
@@ -94,3 +94,54 @@ class AuditLogAdmin(admin.ModelAdmin):
     
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
+
+
+@admin.register(GoogleAuth)
+class GoogleAuthAdmin(admin.ModelAdmin):
+    list_display = ('user', 'google_id', 'created_at', 'token_expiry')
+    list_filter = ('created_at', 'updated_at')
+    search_fields = ('user__email', 'google_id')
+    readonly_fields = ('created_at', 'updated_at', 'google_id', 'access_token', 'id_token')
+    
+    fieldsets = (
+        ('User Information', {
+            'fields': ('user', 'google_id')
+        }),
+        ('Tokens', {
+            'fields': ('access_token', 'refresh_token', 'id_token'),
+            'classes': ('collapse',)
+        }),
+        ('Token Expiry', {
+            'fields': ('token_expiry',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def has_add_permission(self, request):
+        return False
+
+
+@admin.register(Session)
+class SessionAdmin(admin.ModelAdmin):
+    list_display = ('user', 'created_at', 'expires_at', 'is_active', 'ip_address')
+    list_filter = ('is_active', 'created_at', 'expires_at')
+    search_fields = ('user__email', 'ip_address', 'session_token')
+    readonly_fields = ('created_at', 'session_token')
+    
+    fieldsets = (
+        ('User & Token', {
+            'fields': ('user', 'session_token')
+        }),
+        ('Connection Info', {
+            'fields': ('ip_address', 'user_agent')
+        }),
+        ('Session Status', {
+            'fields': ('is_active', 'created_at', 'expires_at')
+        }),
+    )
+    
+    def has_add_permission(self, request):
+        return False
